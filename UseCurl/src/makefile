@@ -15,8 +15,7 @@ INCLUDE = \
 	-I/../
 		
 LINK = \
-	${USR_LIB_DIR}/mysql ${LDOPT} -lmysqlclient \
-	${USR_LIB_DIR} -lz -rdynamic -ldl  -lpthread  -lprotobuf  -lrt -lcurl
+	${USR_LIB_DIR} -lz -rdynamic -ldl  -lpthread  -lrt -lcurl
 
 ##################################下面的基本不用修改#############################
 
@@ -48,10 +47,10 @@ all: $(O_C_FILE) $(O_CPP_FILE) $(TARGET_BIN)
 
 
 $(O_C_FILE) : $(C_FILE)
-	ccache g++ -o $@ -c $(patsubst %.o, %.c, $@) $(INCLUDE) $(C_ARGS)
+	g++ -o $@ -c $(patsubst %.o, %.c, $@) $(INCLUDE) $(C_ARGS)
 
 $(O_CPP_FILE) : $(CPP_FILE)
-	ccache g++ -o $@ -c $(patsubst %.o, %.cpp, $@) $(INCLUDE) $(C_ARGS)
+	g++ -o $@ -c $(patsubst %.o, %.cpp, $@) $(INCLUDE) $(C_ARGS)
 
 $(TARGET_BIN): $(O_CPP_FILE) $(O_C_FILE)
 	$(CXX) -o $(TARGET_BIN) -Wl,-Bstatic $(O_CPP_FILE)$(O_C_FILE) $(LINK)

@@ -1,2 +1,2 @@
-vs管理代码用。
-linux项目在src目录里面
+#./build.sh   --编译
+#./hello   --debug 目录运行编译的执行文件
