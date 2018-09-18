@@ -6,7 +6,7 @@ using namespace std;
 
 size_t RspCallBack(void* buffer, size_t size, size_t cnt, void* para)
 {
-	printf("cb size=%ld\n", size*cnt);
+	printf("cb size=%ld para=%p\n", size*cnt, para);
 	//printf("%s\n", (char *)buffer);
 	//printf("para %ld\n-------------------------\n", (reinterpret_cast<int*>(para)));
 	return size*cnt;
@@ -46,6 +46,20 @@ int testCurl()
 	}
 	
 	return 0;
+}
+
+void testMult()
+{
+	CurlMultiHandler obj;
+	obj.SendHttpGet(url1, RspCallBack, (void *)11, true, false);
+	obj.SendHttpGet(url1, RspCallBack, (void *)12, true, false);
+	obj.SendHttpGet(url1, RspCallBack, (void *)13, true, false);
+
+	while (true)
+	{
+		obj.Handle();
+	}
+
 }
 
 int testErrorNetName()
