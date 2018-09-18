@@ -20,13 +20,13 @@ project "UseCurl"
 
 
 	includedirs { 
-		"../dep/include",
+		"../dep/include/**.h",
 	}
 	files	{ 
 		"../src/**.cpp",  --**递归所有子目录，指定目录可用 "cc/*.cpp" 或者  "cc/**.cpp"
 		"../src/**.cc",
 		"../src/**.h",
 		"../src/**.txt",
-		"../dep/include/**.txt",
+		"../dep/include/**.h",
 	}
 

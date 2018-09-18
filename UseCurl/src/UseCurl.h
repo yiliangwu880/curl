@@ -28,12 +28,13 @@ public:
     ~CurlMultiHandler();
 
 	//处理任务，需要循环调用。
-    void Handle();      
+	//注意:有任务处理时，函数会一直等任务处理完才返回。时间比较久，大概几秒
+	void Handle();
 
 public:
     /////////////////发送接口的封装////////////////////////
 
-    //安全接口，url_str指向内存生存期没要求。 要是讲究效率，不能用这种接口
+    //安全接口，url_str指向内存生存期没要求。
 	bool SendHttpGet(const char* url_str, RevCallBack cb, void* user_para, bool bssl, bool debug=false, curl_slist* header = NULL);
 
 	//直接用curl_easy_perform 发送http post 字符串请求

@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include "string.h"
+
 
 #define LOG_ERROR printf
 #define LOG_DEBUG printf
@@ -12,8 +14,8 @@ using namespace std;
 
 
 CurlMultiHandler::CurlMultiHandler()
+:m_curlMulti(NULL)
 {
-	m_curlMulti = NULL;
 	m_curlMulti = curl_multi_init();
 	if (NULL == m_curlMulti)
 	{
@@ -51,14 +53,14 @@ void CurlMultiHandler::Handle()
 	}
 	if (0 == running_handles)//no task to handle， release cpu.
 	{
-		usleep(1000*30);
 		return;
 	}
+
 	while (running_handles > 0)//running_handles ==0  occupy cpu
 	{
 		if (!curl_multi_select(m_curlMulti))  
 		{  
-			LOG_ERROR("curl_multi_select error\n");
+			//LOG_ERROR("curl_multi_select error\n");
 			break;  
 		}
 
@@ -81,6 +83,7 @@ void CurlMultiHandler::Handle()
 		if (CURLMSG_DONE == msg->msg)   // 已经完成事件的handle
 		{  
 			CURL* curl = msg->easy_handle;
+			printf("DelCurlHandler \n");
 			DelCurlHandler(curl);
 		}
 		else
@@ -88,12 +91,18 @@ void CurlMultiHandler::Handle()
 			LOG_ERROR("curl_multi_info_read失败, error = %s\n", curl_easy_strerror(msg->data.result));
 		}
 	}
+	//printf("msgs_left=%d\n", msgs_left);
+	
 }
 
 
 void CurlMultiHandler::AddCurlHandler(CURL* curl)
 {
-	curl_multi_add_handle(m_curlMulti, curl);
+	CURLMcode code = curl_multi_add_handle(m_curlMulti, curl);
+	if (CURLM_OK != code)
+	{
+		LOG_ERROR("curl_multi_add_handle fail, error code=%d\n", code);
+	}
 }
 
 
@@ -129,7 +138,7 @@ bool CurlMultiHandler::curl_multi_select(CURLM * curl_m)
 	FD_ZERO(&fd_except);  
 
 	timeout_tv.tv_sec = 0;  
-	timeout_tv.tv_usec = 1000*500;  
+	timeout_tv.tv_usec = 1000*500;  //microseconds 微妙
 
 	// 获取multi curl需要监听的文件描述符集合 fd_set //   
 	curl_multi_fdset(curl_m, &fd_read, &fd_write, &fd_except, &max_fd);  
@@ -143,13 +152,13 @@ bool CurlMultiHandler::curl_multi_select(CURLM * curl_m)
 	if (-1 == max_fd)
 	{
 		usleep(1000*100);
+		//LOG_DEBUG("please call curl_multi_perform() or curl_multi_socket*() soon \n");
 		return false;
 	}
-
-	int ret_code = ::select(max_fd + 1, &fd_read, &fd_write, NULL, &timeout_tv);  
+	int ret_code = ::select(max_fd + 1, &fd_read, &fd_write, NULL, &timeout_tv);
 	if(-1 == ret_code)  
 	{  
-		//LOG_ERROR("select error, error = [%s]", strerror(errno))
+		LOG_ERROR("select error, error = [%s]\n", strerror(errno));
 		return  false;  
 	}  
 
