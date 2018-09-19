@@ -1,6 +1,11 @@
 # curl
 curl 库的c++使用
 
+#UseCurl
+好用版本
+
+#curl_test
+实现参考用，没有UseCurl好用。
 
 
 #curl源码 编译安装参考：
